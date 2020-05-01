@@ -30,12 +30,17 @@ const Import: React.FC = () => {
     });
 
     try {
-      await api.post('/transactions/import', data);
+      const files = data.getAll('file');
+      const importFile = new FormData();
+      for (const file of files) {
+        importFile.append('file', file);
+        await api.post('/transactions/import', importFile);
+        importFile.delete('file');
+      }
       history.push('/');
     } catch (err) {
       console.log(err.response.error);
     }
-    data.delete('file');
   }
 
   function submitFile(files: File[]): void {
@@ -47,7 +52,6 @@ const Import: React.FC = () => {
       };
 
       setUploadedFiles([...uploadedFiles, newFile]);
-      console.log(newFile);
     });
   }
 
